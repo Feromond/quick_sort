@@ -5,7 +5,7 @@ use crossterm::{
     Result,
 };
 use crossterm::event::{poll, read, Event};
-use std::{env, io::stdout, thread, time::Duration};
+use std::{io::{self, stdout, BufRead}, thread, time::Duration};
 
 fn quick_sort<T: Ord + std::fmt::Display>(arr: &mut [T]) -> Result<()> {
     if arr.len() > 1 {
@@ -65,14 +65,18 @@ fn visualize<T: std::fmt::Display>(
 }
 
 fn main() -> Result<()> {
-    let args: Vec<String> = env::args().skip(1).collect();
-    let mut numbers: Vec<i32> = args
-        .iter()
-        .filter_map(|arg| arg.parse::<i32>().ok())
+    println!("Enter the list of numbers separated by spaces:");
+    let mut input = String::new();
+    io::stdin().lock().read_line(&mut input)?;
+
+    let mut numbers: Vec<i32> = input
+        .trim()
+        .split_whitespace()
+        .filter_map(|s| s.parse::<i32>().ok())
         .collect();
 
     if numbers.is_empty() {
-        eprintln!("Please provide a list of numbers separated by spaces as an arguments.");
+        eprintln!("Please provide a list of numbers separated by spaces.");
         return Ok(());
     }
 
